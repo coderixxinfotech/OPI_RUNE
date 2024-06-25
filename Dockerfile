@@ -42,7 +42,7 @@ WORKDIR /
 COPY . /
 
 # Build ord
-RUN cd ord-runes && /root/.cargo/bin/cargo build --release
+# RUN cd ord-runes && /root/.cargo/bin/cargo build --release
 
 # Install Node.js modules
 RUN npm install
