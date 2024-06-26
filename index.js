@@ -180,6 +180,7 @@ async function main_index() {
     try {
       let version_string = execSync(ord_version_cmd).toString();
       console.log("ord version: " + version_string);
+      console.log("running: ", ord_index_cmd);
       if (!version_string.includes(ORD_VERSION)) {
         console.error(
           "ord-runes version mismatch, please recompile ord-runes via 'cargo build --release' in ord-runes folder."

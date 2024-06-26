@@ -131,3 +131,5 @@ dist
 
 log_file_error.txt
 package-lock.json
+
+pgdata
