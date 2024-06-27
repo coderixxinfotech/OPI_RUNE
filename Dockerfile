@@ -3,11 +3,6 @@ FROM ubuntu:22.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
-ENV MAIN_POSTGRES_DB_USERNAME=postgres
-ENV MAIN_POSTGRES_DB_PASSWORD=postgres
-ENV MAIN_POSTGRES_DB_NAME=postgres
 
 # Install dependencies
 RUN apt-get update && \
@@ -21,13 +16,6 @@ RUN apt-get update && \
     wget \
     tini \
     tmux && \
-    rm -rf /var/lib/apt/lists/*
-
-# Add PostgreSQL APT repository
-RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-    apt-get update && \
-    apt-get install -y postgresql-16 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
@@ -59,16 +47,6 @@ RUN python3 -m pip install python-dotenv psycopg2-binary json5 stdiomask request
 # Make the entrypoint script executable
 RUN chmod +x entrypoint.sh
 
-# Initialize PostgreSQL and set password, configure PostgreSQL to listen to all IPs
-RUN service postgresql start && \
-    su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\"" && \
-    echo "listen_addresses = '*'" >> /etc/postgresql/16/main/postgresql.conf && \
-    echo "host    all             all             0.0.0.0/0            md5" >> /etc/postgresql/16/main/pg_hba.conf && \
-    echo "local   all             all                                   md5" >> /etc/postgresql/16/main/pg_hba.conf && \
-    service postgresql restart
-
-# Expose necessary ports
-EXPOSE 5432
 
 # Set the entrypoint
 ENTRYPOINT ["/usr/bin/tini", "--", "./entrypoint.sh"]

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Start PostgreSQL service
-service postgresql start
+# service postgresql start
 
-# Set PostgreSQL password
-su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\""
+# # Set PostgreSQL password
+# su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\""
 
 # Loop until ready.txt is found
 while [ ! -f /ready.txt ]; do
