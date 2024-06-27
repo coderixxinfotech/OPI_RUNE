@@ -23,7 +23,7 @@ const api_port = parseInt(process.env.API_PORT || "8003");
 const api_host = process.env.API_HOST || "0.0.0.0";
 
 var app = express();
-app.set("trust proxy", parseInt(process.env.API_TRUSTED_PROXY_CNT || "0"));
+// app.set("trust proxy", parseInt(process.env.API_TRUSTED_PROXY_CNT || "0"));
 
 var corsOptions = {
   origin: "*",
