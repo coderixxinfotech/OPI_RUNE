@@ -12,7 +12,6 @@ ENV MAIN_POSTGRES_DB_NAME=postgres
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
-    postgresql postgresql-contrib \
     ca-certificates curl gnupg \
     build-essential \
     python3-pip \
@@ -22,6 +21,13 @@ RUN apt-get update && \
     wget \
     tini \
     tmux && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add PostgreSQL APT repository
+RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list && \
+    apt-get update && \
+    apt-get install -y postgresql-16 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
@@ -56,9 +62,9 @@ RUN chmod +x entrypoint.sh
 # Initialize PostgreSQL and set password, configure PostgreSQL to listen to all IPs
 RUN service postgresql start && \
     su - postgres -c "psql -c \"ALTER USER postgres PASSWORD 'postgres';\"" && \
-    echo "listen_addresses = '*'" >> /etc/postgresql/14/main/postgresql.conf && \
-    echo "host    all             all             0.0.0.0/0            md5" >> /etc/postgresql/14/main/pg_hba.conf && \
-    echo "local   all             all                                   md5" >> /etc/postgresql/14/main/pg_hba.conf && \
+    echo "listen_addresses = '*'" >> /etc/postgresql/16/main/postgresql.conf && \
+    echo "host    all             all             0.0.0.0/0            md5" >> /etc/postgresql/16/main/pg_hba.conf && \
+    echo "local   all             all                                   md5" >> /etc/postgresql/16/main/pg_hba.conf && \
     service postgresql restart
 
 # Expose necessary ports
