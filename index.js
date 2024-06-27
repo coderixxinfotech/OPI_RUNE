@@ -360,6 +360,12 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
 
     // Extract txids from the initial result set
     let txids = initialResult.rows.map((row) => row.txid);
+    if (txids.length === 0) {
+      return response.send({
+        error: null,
+        result: resultObject,
+      });
+    }
 
     // Construct the second query to fetch items with the same txids
     let txidPlaceholders = txids.map((_, index) => `$${index + 1}`).join(", ");
@@ -401,9 +407,6 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
 
     // Convert Map to an object
     const resultObject = Object.fromEntries(eventMap);
-
-    // Convert the result object to JSON
-    const jsonString = JSON.stringify(resultObject);
 
     // Now eventMap contains the grouped events by txid
 
