@@ -13,7 +13,7 @@ var db_pool = new Pool({
   user: process.env.DB_USER || "postgres",
   host: process.env.DB_HOST || "localhost",
   database: process.env.DB_DATABASE || "postgres",
-  password: process.env.DB_PASSWD,
+  password: process.env.DB_PASSWD || "postgres",
   port: parseInt(process.env.DB_PORT || "5432"),
   max: process.env.DB_MAX_CONNECTIONS || 10, // maximum number of clients!!
   ssl: process.env.DB_SSL == "true" ? true : false,
