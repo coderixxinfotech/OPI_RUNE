@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of your application files
 COPY . .
 
+# List the files in the working directory to ensure index.js is copied
+RUN ls -al /usr/src/app
+
 # Expose the port your application will run on
 EXPOSE 8080
 
