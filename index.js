@@ -11,12 +11,13 @@ const EVENT_SEPARATOR = "|";
 
 var db_pool = new Pool({
   user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "localhost",
+  host: process.env.DB_HOST || "postgres-container",
   database: process.env.DB_DATABASE || "postgres",
   password: process.env.DB_PASSWD || "postgres",
   port: parseInt(process.env.DB_PORT || "5432"),
   max: process.env.DB_MAX_CONNECTIONS || 10, // maximum number of clients!!
-  ssl: process.env.DB_SSL == "true" ? true : false,
+  // ssl: process.env.DB_SSL == "true" ? true : false,
+  ssl: false,
 });
 
 const api_port = parseInt(process.env.API_PORT || "8003");
