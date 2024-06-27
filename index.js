@@ -4,8 +4,6 @@ const { Pool } = require("pg");
 var cors = require("cors");
 const crypto = require("crypto");
 
-var bitcoin = require("bitcoinjs-lib");
-const { Address } = require("@cmdcode/tapscript");
 // for self-signed cert of postgres
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -119,14 +117,6 @@ app.get("/v1/runes/activity_on_block", async (request, response) => {
       `${request.protocol}://${request.get("host")}${request.originalUrl}`
     );
 
-    // let ex = [
-    //   "OP_1",
-    //   "02eac27571aacf6a1e96f550adcc6f24eb3bbc2da80b0802f26810ea3703aaf4",
-    // ];
-
-    // console.log(Address.toScriptPubKey("1LvhP7Cq5z87Cj9tkT7f9BpVpXL8NTCoGm"));
-    // console.log(Address.fromScriptPubKey(ex));
-
     let block_height = request.query.block_height;
 
     let current_block_height = await get_block_height_of_db();
@@ -211,14 +201,6 @@ app.get("/v1/runes/activity_of_address", async (request, response) => {
     console.log(
       `${request.protocol}://${request.get("host")}${request.originalUrl}`
     );
-
-    // let ex = [
-    //   "OP_1",
-    //   "02eac27571aacf6a1e96f550adcc6f24eb3bbc2da80b0802f26810ea3703aaf4",
-    // ];
-
-    // console.log(Address.toScriptPubKey("1LvhP7Cq5z87Cj9tkT7f9BpVpXL8NTCoGm"));
-    // console.log(Address.fromScriptPubKey(ex));
 
     let address = request.query.address;
 
@@ -628,34 +610,3 @@ app.get("/v1/runes/event", async (request, response) => {
 app.listen(api_port, api_host);
 
 console.log(`runes_api listening on ${api_host}:${api_port}`);
-
-const getAddressFromScriptPubkey = (pkscript) => {
-  let script = [];
-  let address = "";
-  if (pkscript && pkscript.startsWith("5120"))
-    script = ["OP_1", pkscript.slice(4)];
-  else if (pkscript && pkscript.startsWith("0014"))
-    script = ["OP_0", pkscript.slice(4)];
-  else if (pkscript && pkscript.startsWith("0020"))
-    script = ["OP_0", pkscript.slice(4)];
-  else if (pkscript && pkscript.startsWith("a914") && pkscript.endsWith("87")) {
-    // Extract the middle part by removing the first 4 and last 2 characters
-    const middlePart = pkscript.slice(4, -2);
-    script = ["OP_HASH160", middlePart, "OP_EQUAL"];
-  } else if (
-    pkscript &&
-    pkscript.startsWith("76a914") &&
-    pkscript.endsWith("88ac")
-  ) {
-    // Extract the middle part by removing the first 6 and last 4 characters
-    const middlePart = pkscript.slice(6, -4);
-
-    const pubKeyHashHex = middlePart;
-    const pubKeyHash = Buffer.from(pubKeyHashHex, "hex");
-    address = bitcoin.payments.p2pkh({ hash: pubKeyHash }).address;
-  } else {
-    if (pkscript) console.log(pkscript);
-  }
-  if (script && script.length) return Address.fromScriptPubKey(script);
-  return address;
-};
