@@ -24,7 +24,8 @@ var db_pool = new Pool({
   password: process.env.DB_PASSWD,
   port: parseInt(process.env.DB_PORT || "5432"),
   max: process.env.DB_MAX_CONNECTIONS || 50, // maximum number of clients!!
-  ssl: process.env.DB_SSL == "true" ? true : false,
+  // ssl: process.env.DB_SSL == "true" ? true : false,
+  ssl: false,
 });
 
 var chain_folder = process.env.BITCOIN_CHAIN_FOLDER || "~/.bitcoin/";
