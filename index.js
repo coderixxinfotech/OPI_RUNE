@@ -329,6 +329,7 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     console.log({ event_type_id_to_name });
     let address = request.query.address;
     let block_height = request.query.block_height;
+    let block_limit = request.query.block_limit;
 
     let whereClauses = [];
     let queryParams = [];
@@ -340,6 +341,10 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     if (block_height) {
       whereClauses.push("re.block_height = $" + (queryParams.length + 1));
       queryParams.push(block_height);
+    }
+    if (block_limit) {
+      whereClauses.push("re.block_height <= $" + (queryParams.length + 1));
+      queryParams.push(block_limit);
     }
 
     let whereClause =
