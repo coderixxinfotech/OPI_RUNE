@@ -329,7 +329,8 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     console.log({ event_type_id_to_name });
     let address = request.query.address;
     let block_height = request.query.block_height;
-    let block_limit = request.query.block_limit;
+    let low_block_limit = request.query.low_block_limit || 839999;
+    let high_block_limit = request.query.high_block_limit;
 
     let whereClauses = [];
     let queryParams = [];
@@ -342,9 +343,13 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
       whereClauses.push("re.block_height = $" + (queryParams.length + 1));
       queryParams.push(block_height);
     }
-    if (block_limit) {
+    if (low_block_limit) {
+      whereClauses.push("re.block_height >= $" + (queryParams.length + 1));
+      queryParams.push(low_block_limit);
+    }
+    if (high_block_limit) {
       whereClauses.push("re.block_height <= $" + (queryParams.length + 1));
-      queryParams.push(block_limit);
+      queryParams.push(high_block_limit);
     }
 
     let whereClause =
@@ -361,14 +366,12 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     console.log({ initialQuery });
     let initialResult = await query_db(initialQuery, queryParams);
 
-    // console.log({ initialResult });
-
     // Extract txids from the initial result set
     let txids = initialResult.rows.map((row) => row.txid);
     if (txids.length === 0) {
       return response.send({
         error: null,
-        result: resultObject,
+        result: null,
       });
     }
 
@@ -384,8 +387,6 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
 
     console.log({ secondQuery });
     let finalResult = await query_db(secondQuery, txids);
-
-    // console.log({ finalResult });
 
     const eventMap = new Map();
 
@@ -412,8 +413,6 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
 
     // Convert Map to an object
     const resultObject = Object.fromEntries(eventMap);
-
-    // Now eventMap contains the grouped events by txid
 
     response.send({
       error: null,
