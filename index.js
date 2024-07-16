@@ -182,6 +182,7 @@ async function main_index() {
       let version_string = execSync(ord_version_cmd).toString();
       console.log("ord version: " + version_string);
       console.log("running: ", ord_index_cmd);
+
       if (!version_string.includes(ORD_VERSION)) {
         console.error(
           "ord-runes version mismatch, please recompile ord-runes via 'cargo build --release' in ord-runes folder."
@@ -189,6 +190,7 @@ async function main_index() {
         process.exit(1);
       }
       execSync(ord_index_cmd, { stdio: "inherit" });
+      // throw Error("he");
     } catch (err) {
       console.error("ERROR ON ORD!!!");
       console.error(err);
