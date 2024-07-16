@@ -331,6 +331,7 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     let block_height = request.query.block_height;
     let low_block_limit = request.query.low_block_limit || 839999;
     let high_block_limit = request.query.high_block_limit;
+    let rune_name = request.query.rune_name; // Extract the rune_name parameter
 
     let whereClauses = [];
     let queryParams = [];
@@ -351,17 +352,21 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
       whereClauses.push("re.block_height <= $" + (queryParams.length + 1));
       queryParams.push(high_block_limit);
     }
+    if (rune_name) {
+      whereClauses.push("rite.rune_name = $" + (queryParams.length + 1));
+      queryParams.push(rune_name);
+    }
 
     let whereClause =
       whereClauses.length > 0 ? "where " + whereClauses.join(" and ") : "";
 
     let initialQuery = `
-  select re.event_type, re.outpoint, re.wallet_addr, re.block_height, re.rune_id, rite.rune_name, rite.divisibility, re.amount, re.txid
-  from runes_events re
-  left join runes_id_to_entry rite on re.rune_id = rite.rune_id
-  ${whereClause}
-  order by re.id asc;
-`;
+      select re.event_type, re.outpoint, re.wallet_addr, re.block_height, re.rune_id, rite.rune_name, rite.divisibility, re.amount, re.txid
+      from runes_events re
+      left join runes_id_to_entry rite on re.rune_id = rite.rune_id
+      ${whereClause}
+      order by re.id asc;
+    `;
 
     console.log({ initialQuery });
     let initialResult = await query_db(initialQuery, queryParams);
@@ -378,12 +383,12 @@ app.get("/v1/runes/activity_of_address_on_block", async (request, response) => {
     // Construct the second query to fetch items with the same txids
     let txidPlaceholders = txids.map((_, index) => `$${index + 1}`).join(", ");
     let secondQuery = `
-  select re.event_type, re.outpoint, re.wallet_addr, re.block_height, re.rune_id, rite.rune_name, rite.divisibility, re.amount, re.txid
-  from runes_events re
-  left join runes_id_to_entry rite on re.rune_id = rite.rune_id
-  where re.txid in (${txidPlaceholders})
-  order by re.id asc;
-`;
+      select re.event_type, re.outpoint, re.wallet_addr, re.block_height, re.rune_id, rite.rune_name, rite.divisibility, re.amount, re.txid
+      from runes_events re
+      left join runes_id_to_entry rite on re.rune_id = rite.rune_id
+      where re.txid in (${txidPlaceholders})
+      order by re.id asc;
+    `;
 
     console.log({ secondQuery });
     let finalResult = await query_db(secondQuery, txids);
